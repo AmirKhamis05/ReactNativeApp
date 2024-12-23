@@ -12,7 +12,7 @@ export default function Navbar({ currentDashBoard }: any) {
   };
 
   const onProfilePress = () => {
-    router.push("/profile/profile");
+    router.push("/(tabs)/profile");
   };
 
   const onSignOut = async () => {
@@ -25,7 +25,7 @@ export default function Navbar({ currentDashBoard }: any) {
   };
 
   return (
-    <View>
+    <View style={styles.navContainer}>
       {currentDashBoard === "main" && (
         <View style={styles.navbar}>
           {/* Website Name */}
@@ -39,7 +39,7 @@ export default function Navbar({ currentDashBoard }: any) {
           </TouchableOpacity>
         </View>
       )}
-      :
+
       {currentDashBoard === "profile" && (
         <View style={styles.navbar}>
           {/* Website Name */}
@@ -49,7 +49,7 @@ export default function Navbar({ currentDashBoard }: any) {
 
           {/* Profile Option */}
           <TouchableOpacity onPress={onSignOut}>
-            <Text style={styles.profile}>signout</Text>
+            <Text style={styles.profile}>Signout</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -58,15 +58,20 @@ export default function Navbar({ currentDashBoard }: any) {
 }
 
 const styles = StyleSheet.create({
+  navContainer: {
+    backgroundColor: "#fff", // White background for testing
+    width: "100%", // Full-width navbar
+  },
   navbar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 10,
+    paddingVertical: 10, // Adjust padding as needed
     paddingHorizontal: 15,
-    backgroundColor: "#222", // Dark background
+    backgroundColor: "#222", // Dark navbar color
+    height: 60, // Explicit height for navbar
     borderBottomWidth: 1,
-    borderBottomColor: "#444", // Border for separation
+    borderBottomColor: "#444",
   },
   title: {
     fontSize: 18,
@@ -75,6 +80,7 @@ const styles = StyleSheet.create({
   },
   profile: {
     fontSize: 16,
+    fontWeight: "bold",
     color: "#1e90ff", // Blue text for profile
   },
 });

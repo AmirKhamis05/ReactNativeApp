@@ -10,11 +10,18 @@ import {
 import { auth } from "../firebase/firebase";
 import { useNavigation } from "@react-navigation/native";
 
-const BlogList = ({ blogs, title, handleDelete }: any) => {
+const BlogList = ({ blogs, title, handleDelete }) => {
   const userId = auth.currentUser?.uid;
   const navigation = useNavigation();
 
-  const handleEdit = () => navigation.navigate("editBlog");
+  const handleEdit = (blog) => {
+    navigation.navigate("editBlog", {
+      blogId: blog.id,
+      title: blog.title,
+      body: blog.body,
+      author: blog.author,
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -27,14 +34,14 @@ const BlogList = ({ blogs, title, handleDelete }: any) => {
           {blog.userId == userId && (
             <View style={styles.buttonContainer}>
               <TouchableOpacity
-                style={styles.deleteButton}
+                style={[styles.deleteButton, { marginHorizontal: 10 }]}
                 onPress={() => handleDelete(blog.id)}
               >
                 <Text style={styles.deleteText}>Delete Blog</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.deleteButton}
-                onPress={handleEdit}
+                onPress={() => handleEdit(blog)}
               >
                 <Text style={styles.deleteText}>Edit Blog</Text>
               </TouchableOpacity>

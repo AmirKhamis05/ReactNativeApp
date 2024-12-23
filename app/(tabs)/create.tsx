@@ -9,6 +9,7 @@ import {
 } from "react-native";
 // import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
+import Navbar from "../components/NavBar";
 import { database, auth } from "../firebase/firebase"; // Firebase Realtime DB
 import { ref, push, get } from "firebase/database";
 import { useRouter } from "expo-router";
@@ -64,38 +65,33 @@ const Create = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Add a New Blog</Text>
+    <>
+      <Navbar currentDashBoard="main" />
+      <View style={styles.container}>
+        <Text style={styles.heading}>Add a New Blog</Text>
 
-      <Text style={styles.label}>Blog Title:</Text>
-      <TextInput
-        style={styles.input}
-        value={title}
-        onChangeText={(text) => setTitle(text)}
-      />
+        <Text style={styles.label}>Blog Title:</Text>
+        <TextInput
+          style={styles.input}
+          value={title}
+          onChangeText={(text) => setTitle(text)}
+        />
 
-      <Text style={styles.label}>Blog Body:</Text>
-      <TextInput
-        style={[styles.input, { height: 100 }]}
-        value={body}
-        onChangeText={(text) => setBody(text)}
-        multiline
-      />
+        <Text style={styles.label}>Blog Body:</Text>
+        <TextInput
+          style={[styles.input, { height: 100 }]}
+          value={body}
+          onChangeText={(text) => setBody(text)}
+          multiline
+        />
 
-      {/* <Text style={styles.label}>Blog Author:</Text>
-      <TextInput
-        style={[styles.input]}
-        value={author}
-        onChangeText={(text) => setAuthor(text)}
-        multiline
-      /> */}
-
-      {isPending ? (
-        <ActivityIndicator size="large" color="#f1356d" />
-      ) : (
-        <Button title="Submit" onPress={handleSubmit} color="#f1356d" />
-      )}
-    </View>
+        {isPending ? (
+          <ActivityIndicator size="large" color="#f1356d" />
+        ) : (
+          <Button title="Submit" onPress={handleSubmit} color="#f1356d" />
+        )}
+      </View>
+    </>
   );
 };
 

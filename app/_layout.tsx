@@ -42,7 +42,6 @@ export default function RootLayout() {
             name="auth"
             options={{ headerShown: false, presentation: "modal" }}
           />
-          <Stack.Screen name="profile" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>

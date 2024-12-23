@@ -16,6 +16,7 @@ export default function SignUp() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [description, setDescription] = useState("");
   const router = useRouter();
 
   const handleSignUp = async () => {
@@ -25,7 +26,11 @@ export default function SignUp() {
           const user = userCredentials.user;
           const uid = user.uid;
 
-          set(ref(database, "users/" + uid), { Username: username });
+          set(ref(database, "users/" + uid), {
+            Username: username,
+            Email: email,
+            Description: description,
+          });
         }
       );
       router.replace("/"); // Redirect to the main app
@@ -61,6 +66,13 @@ export default function SignUp() {
         secureTextEntry
         onChangeText={setPassword}
         value={password}
+      />
+      <TextInput
+        style={[styles.input, { height: 100 }]}
+        placeholder="Description"
+        placeholderTextColor="#aaa"
+        onChangeText={setDescription}
+        value={description}
       />
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={styles.buttonText}>Sign Up</Text>

@@ -71,7 +71,7 @@ const Home = () => {
           ) : (
             <Text style={styles.emptyContainer}>No blogs found.</Text>
           )}
-          {/* Centering only the AppButton */}
+
           <View style={styles.buttonContainer}>
             <AppButton title="Nostalgia" onPress={openLink} />
           </View>

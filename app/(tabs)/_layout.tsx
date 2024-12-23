@@ -1,3 +1,10 @@
+// import TabsLayout from "../components/TabsLayout";
+
+// export default function TabsLayoutWrapper() {
+//   return <TabsLayout />;
+// }
+
+// components/TabsLayout.tsx
 import { Tabs } from "expo-router";
 import { Platform, View, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
@@ -11,7 +18,7 @@ import { Colors } from "../constants/Colors";
 import { useColorScheme } from "../hooks/useColorScheme";
 import { auth } from "../firebase/firebase";
 
-export default function TabLayout() {
+export default function TabsLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -48,7 +55,6 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
             position: "absolute",
           },
           default: {},
@@ -73,6 +79,11 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      {/* Excluding unwanted routes */}
+      <Tabs.Screen name="editBlog" options={{ href: null }} />
+      <Tabs.Screen name="editProfile" options={{ href: null }} />
+      <Tabs.Screen name="profile" options={{ href: null }} />
     </Tabs>
   );
 }
