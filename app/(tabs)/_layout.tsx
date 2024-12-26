@@ -1,10 +1,3 @@
-// import TabsLayout from "../components/TabsLayout";
-
-// export default function TabsLayoutWrapper() {
-//   return <TabsLayout />;
-// }
-
-// components/TabsLayout.tsx
 import { Tabs } from "expo-router";
 import { Platform, View, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
@@ -84,6 +77,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="editBlog" options={{ href: null }} />
       <Tabs.Screen name="editProfile" options={{ href: null }} />
       <Tabs.Screen name="profile" options={{ href: null }} />
+      <Tabs.Screen name="blogPage" options={{ href: null }} />
     </Tabs>
   );
 }

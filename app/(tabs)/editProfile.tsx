@@ -12,6 +12,37 @@ import { database, auth } from "../firebase/firebase";
 import { ref, get, update } from "firebase/database";
 import { useRouter } from "expo-router";
 
+async function updateAllBlogs(userId, newUsername) {
+  try {
+    // Fetch all blogs
+    const blogsSnapshot = await get(ref(database, "blogs/"));
+    if (blogsSnapshot.exists()) {
+      const blogs = blogsSnapshot.val();
+
+      // Iterate through blogs to find those authored by the user
+      const updates = {};
+      Object.entries(blogs).forEach(([blogId, blog]) => {
+        if (blog.userId === userId) {
+          // Update the author field
+          updates[`blogs/${blogId}/author`] = newUsername;
+        }
+      });
+
+      // Perform the updates in a single batch
+      if (Object.keys(updates).length > 0) {
+        await update(ref(database), updates);
+        console.log("All relevant blogs updated successfully.");
+      } else {
+        console.log("No blogs found for the given userId.");
+      }
+    } else {
+      console.error("No blogs found in the database.");
+    }
+  } catch (error) {
+    console.error("Error updating blogs:", error);
+  }
+}
+
 export default function EditProfile() {
   const [username, setUsername] = useState("");
   const [description, setDescription] = useState("");
@@ -60,6 +91,8 @@ export default function EditProfile() {
         Username: username,
         Description: description,
       });
+
+      await updateAllBlogs(userId, username);
 
       Alert.alert("Success", "Profile updated successfully!");
       router.replace("/(tabs)/profile");

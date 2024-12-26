@@ -54,7 +54,6 @@ const Create = () => {
         console.log("New blog added");
         setTitle("");
         setBody("");
-        setAuthor("");
         setIsPending(false);
         navigation.navigate("index");
       })

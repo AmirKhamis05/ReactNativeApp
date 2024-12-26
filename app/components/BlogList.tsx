@@ -9,17 +9,35 @@ import {
 } from "react-native";
 import { auth } from "../firebase/firebase";
 import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 
 const BlogList = ({ blogs, title, handleDelete }) => {
   const userId = auth.currentUser?.uid;
   const navigation = useNavigation();
+  const router = useRouter();
 
   const handleEdit = (blog) => {
-    navigation.navigate("editBlog", {
-      blogId: blog.id,
-      title: blog.title,
-      body: blog.body,
-      author: blog.author,
+    router.push({
+      pathname: "/editBlog",
+      params: {
+        blogId: blog.id,
+        title: blog.title,
+        body: blog.body,
+        author: blog.author,
+      },
+    });
+  };
+
+  const handleViewBlog = (blog) => {
+    router.push({
+      pathname: "/blogPage",
+      params: {
+        blogId: blog.id,
+        title: blog.title,
+        body: blog.body,
+        author: blog.author,
+        userId: blog.userId,
+      },
     });
   };
 
@@ -31,22 +49,39 @@ const BlogList = ({ blogs, title, handleDelete }) => {
           <Text style={styles.blogTitle}>Title: {blog.title}</Text>
           <Text style={styles.blogBody}>Content: {blog.body}</Text>
           <Text style={styles.author}>Written by: {blog.author}</Text>
-          {blog.userId == userId && (
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.deleteButton, { marginHorizontal: 10 }]}
-                onPress={() => handleDelete(blog.id)}
-              >
-                <Text style={styles.deleteText}>Delete Blog</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => handleEdit(blog)}
-              >
-                <Text style={styles.deleteText}>Edit Blog</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          <View style={styles.buttonContainer}>
+            {blog.userId == userId ? (
+              <>
+                <TouchableOpacity
+                  style={[styles.deleteButton]}
+                  onPress={() => handleDelete(blog.id)}
+                >
+                  <Text style={styles.deleteText}>Delete Blog</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.deleteButton, { marginHorizontal: 10 }]}
+                  onPress={() => handleEdit(blog)}
+                >
+                  <Text style={styles.deleteText}>Edit Blog</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => handleViewBlog(blog)}
+                >
+                  <Text style={styles.deleteText}>View Blog</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => handleViewBlog(blog)}
+                >
+                  <Text style={styles.deleteText}>View Blog</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
         </View>
       ))}
     </View>
@@ -95,13 +130,16 @@ const styles = StyleSheet.create({
   },
   blogBody: {
     color: "#666",
-    fontSize: 14,
+    fontSize: 20,
     marginBottom: 10,
+    maxHeight: 100,
+    overflow: "hidden",
+    lineHeight: 22,
   },
   buttonContainer: {
-    flexDirection: "row", // Arrange children in a row
-    alignItems: "center", // Center buttons vertically
-    marginTop: 10, // Optional: add some space above the buttons
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
   },
 });
 

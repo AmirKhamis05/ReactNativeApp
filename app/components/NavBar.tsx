@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  StatusBar,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { auth } from "../firebase/firebase";
 import { signOut } from "firebase/auth";
@@ -24,8 +31,13 @@ export default function Navbar({ currentDashBoard }: any) {
     }
   };
 
+  const dynamicNavStyle = {
+    paddingTop: Platform.OS !== "web" ? StatusBar.currentHeight || 0 : 0,
+    backgroundColor: "#222",
+  };
+
   return (
-    <View style={styles.navContainer}>
+    <View style={[styles.navContainer, dynamicNavStyle]}>
       {currentDashBoard === "main" && (
         <View style={styles.navbar}>
           {/* Website Name */}

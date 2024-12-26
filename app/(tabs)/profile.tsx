@@ -1,24 +1,49 @@
-import { useEffect, useState, useLayoutEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
   Image,
   StyleSheet,
   TouchableOpacity,
-  Linking,
+  ScrollView,
 } from "react-native";
 import Navbar from "../components/NavBar";
 import { database, auth } from "../firebase/firebase";
-import { get, ref } from "firebase/database";
+import { get, ref, remove, onValue } from "firebase/database";
 import { useRouter } from "expo-router";
+import ProfileBlogList from "../components/ProfileBlogList";
 
 const ProfileCard = () => {
   const userId = auth.currentUser?.uid;
   const router = useRouter();
   const [userData, setUserData] = useState({});
+  const [blogs, setBlogs] = useState([]);
+  const [isPending, setIsPending] = useState(true);
 
-  const handleEdit = () => {
-    router.push("/(tabs)/editProfile");
+  useEffect(() => {
+    const blogsRef = ref(database, "blogs/");
+    const unsubscribe = onValue(blogsRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const blogsArray = Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key],
+        }));
+        setBlogs(blogsArray);
+      } else {
+        setBlogs([]);
+      }
+      setIsPending(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleDelete = (id) => {
+    const blogRef = ref(database, `blogs/${id}`);
+    remove(blogRef).then(() => {
+      setBlogs(blogs.filter((blog) => blog.id !== id));
+    });
   };
 
   useEffect(() => {
@@ -30,9 +55,7 @@ const ProfileCard = () => {
       try {
         const snapshot = await get(ref(database, `users/${userId}`));
         if (snapshot.exists()) {
-          setUserData(snapshot.val()); // Correctly set the author as the username string
-        } else {
-          console.error("No user data found");
+          setUserData(snapshot.val());
         }
       } catch (error) {
         console.error("Error fetching author:", error);
@@ -45,57 +68,64 @@ const ProfileCard = () => {
   return (
     <>
       <Navbar currentDashBoard={"profile"} />
-      <View style={styles.container}>
-        <View style={styles.card}>
-          {/* Profile Image */}
-          <View style={styles.imageContainer}>
-            <Image
-              source={require("../../assets/images/profile/pfp.png")} // Replace with the correct path
-              style={styles.profileImage}
-            />
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.container}>
+          <View style={styles.card}>
+            <View style={styles.imageContainer}>
+              <Image
+                source={require("../../assets/images/profile/pfp.png")}
+                style={styles.profileImage}
+              />
+            </View>
+            <View style={styles.infoContainer}>
+              <Text style={styles.userBadge}>User</Text>
+              <Text style={styles.username}>
+                {userData.Username || "Guest"}
+              </Text>
+              <Text style={styles.subtitle}>Blogging Enthusiast</Text>
+              <View style={styles.descriptionContainer}>
+                <Text style={styles.description}>
+                  <Text style={styles.boldText}>Description:</Text>{" "}
+                  {userData.Description || "No description available."}
+                </Text>
+              </View>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.outlineButton}
+                  onPress={() => router.push("/(tabs)/editProfile")}
+                >
+                  <Text style={styles.outlineButtonText}>Edit Profile</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
 
-          {/* User Information */}
-          <View style={styles.infoContainer}>
-            <Text style={styles.userBadge}>User</Text>
-            <Text style={styles.username}>{userData.Username || "Guest"}</Text>
-            <Text style={styles.subtitle}>Blogging Enthusiast</Text>
-
-            {/* User Description */}
-            <View style={styles.descriptionContainer}>
-              <Text style={styles.description}>
-                <Text style={styles.boldText}>Description:</Text>{" "}
-                {userData.Description || "No description available."}
-              </Text>
-            </View>
-
-            {/* Buttons */}
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.outlineButton}
-                onPress={() => handleEdit()}
-              >
-                <Text style={styles.outlineButtonText}>Edit Profile</Text>
-              </TouchableOpacity>
-            </View>
+          {/* Blog List */}
+          <View style={styles.blogsContainer}>
+            {blogs.length !== 0 ? (
+              <ProfileBlogList
+                blogs={blogs}
+                title="Blog List"
+                handleDelete={handleDelete}
+              />
+            ) : (
+              <Text style={styles.emptyContainer}>No blogs found.</Text>
+            )}
           </View>
         </View>
-      </View>
+      </ScrollView>
     </>
   );
 };
 
-export const options = {
-  headerShown: false,
-};
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
+  scrollContent: {
+    flexGrow: 1,
     backgroundColor: "#f5f5f5",
-    padding: 20,
+  },
+  container: {
+    alignItems: "center",
+    paddingBottom: 20,
   },
   card: {
     backgroundColor: "#fff",
@@ -108,7 +138,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
+    marginBottom: 20, // Space between the profile card and the blog list
   },
+  blogsContainer: {
+    width: "90%",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 10,
+  },
+  emptyContainer: {
+    textAlign: "center",
+    fontSize: 18,
+    color: "#666",
+    fontWeight: "bold",
+  },
+  /* Rest of your styles remain the same */
   imageContainer: {
     marginBottom: 20,
   },
@@ -180,3 +224,7 @@ const styles = StyleSheet.create({
 });
 
 export default ProfileCard;
+
+export const options = {
+  headerShown: false,
+};
