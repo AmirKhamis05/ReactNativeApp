@@ -121,6 +121,7 @@ const ProfileCard = () => {
 const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
+    paddingTop: 10,
     backgroundColor: "#f5f5f5",
   },
   container: {
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
-    marginBottom: 20, // Space between the profile card and the blog list
+    marginBottom: 20,
   },
   blogsContainer: {
     width: "90%",
@@ -151,8 +152,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#666",
     fontWeight: "bold",
+    height: 100,
   },
-  /* Rest of your styles remain the same */
   imageContainer: {
     marginBottom: 20,
   },

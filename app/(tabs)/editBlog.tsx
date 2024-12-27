@@ -10,6 +10,7 @@ import {
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { database, auth } from "../firebase/firebase"; // Firebase Realtime DB
 import { ref, get, update } from "firebase/database";
+import Navbar from "../components/NavBar";
 
 const EditBlog = () => {
   const navigation = useNavigation();
@@ -52,30 +53,33 @@ const EditBlog = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Edit Blog</Text>
+    <>
+      <Navbar currentDashBoard={"main"} />
+      <View style={styles.container}>
+        <Text style={styles.heading}>Edit Blog</Text>
 
-      <Text style={styles.label}>Blog Title:</Text>
-      <TextInput
-        style={styles.input}
-        value={title}
-        onChangeText={(text) => setTitle(text)}
-      />
+        <Text style={styles.label}>Blog Title:</Text>
+        <TextInput
+          style={styles.input}
+          value={title}
+          onChangeText={(text) => setTitle(text)}
+        />
 
-      <Text style={styles.label}>Blog Body:</Text>
-      <TextInput
-        style={[styles.input, { height: 100 }]}
-        value={body}
-        onChangeText={(text) => setBody(text)}
-        multiline
-      />
+        <Text style={styles.label}>Blog Body:</Text>
+        <TextInput
+          style={[styles.input, { height: 100 }]}
+          value={body}
+          onChangeText={(text) => setBody(text)}
+          multiline
+        />
 
-      {isPending ? (
-        <ActivityIndicator size="large" color="#f1356d" />
-      ) : (
-        <Button title="Save Changes" onPress={handleEdit} color="#f1356d" />
-      )}
-    </View>
+        {isPending ? (
+          <ActivityIndicator size="large" color="#f1356d" />
+        ) : (
+          <Button title="Save Changes" onPress={handleEdit} color="#f1356d" />
+        )}
+      </View>
+    </>
   );
 };
 

@@ -2,17 +2,35 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { auth } from "../firebase/firebase";
 import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 
 const ProfileBlogList = ({ blogs, title, handleDelete }) => {
   const userId = auth.currentUser?.uid; // Get the logged-in user's ID
   const navigation = useNavigation();
+  const router = useRouter();
 
   const handleEdit = (blog) => {
-    navigation.navigate("editBlog", {
-      blogId: blog.id,
-      title: blog.title,
-      body: blog.body,
-      author: blog.author,
+    router.push({
+      pathname: "/(tabs)/editBlog",
+      params: {
+        blogId: blog.id,
+        title: blog.title,
+        body: blog.body,
+        author: blog.author,
+      },
+    });
+  };
+
+  const handleViewBlog = (blog) => {
+    router.push({
+      pathname: "/blogPage",
+      params: {
+        blogId: blog.id,
+        title: blog.title,
+        body: blog.body,
+        author: blog.author,
+        userId: blog.userId,
+      },
     });
   };
 
@@ -29,16 +47,22 @@ const ProfileBlogList = ({ blogs, title, handleDelete }) => {
           <Text style={styles.author}>Written by: {blog.author}</Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
-              style={[styles.deleteButton, { marginHorizontal: 10 }]}
+              style={styles.deleteButton}
               onPress={() => handleDelete(blog.id)}
             >
               <Text style={styles.deleteText}>Delete Blog</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.deleteButton}
+              style={[styles.deleteButton, { marginHorizontal: 10 }]}
               onPress={() => handleEdit(blog)}
             >
               <Text style={styles.deleteText}>Edit Blog</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleViewBlog(blog)}
+            >
+              <Text style={styles.deleteText}>View Blog</Text>
             </TouchableOpacity>
           </View>
         </View>

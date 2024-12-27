@@ -99,6 +99,16 @@ const SingleBlog = () => {
           <Text style={styles.description}>
             {authorData.Description || "No description available."}
           </Text>
+          {currentUserId === userId && (
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.outlineButton}
+                onPress={() => router.push("/(tabs)/profile")}
+              >
+                <Text style={styles.outlineButtonText}>Go To Profile</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </ScrollView>
     </>
@@ -206,6 +216,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
+  },
+  outlineButton: {
+    borderWidth: 2,
+    borderColor: "#6f42c1",
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginHorizontal: 5,
+  },
+  outlineButtonText: {
+    color: "#6f42c1",
+    fontWeight: "bold",
   },
 });
 

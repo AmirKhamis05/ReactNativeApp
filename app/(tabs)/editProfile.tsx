@@ -11,6 +11,7 @@ import {
 import { database, auth } from "../firebase/firebase";
 import { ref, get, update } from "firebase/database";
 import { useRouter } from "expo-router";
+import Navbar from "../components/NavBar";
 
 async function updateAllBlogs(userId, newUsername) {
   try {
@@ -105,34 +106,37 @@ export default function EditProfile() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Edit Profile</Text>
+    <>
+      <Navbar currentDashBoard={"main"} />
+      <View style={styles.container}>
+        <Text style={styles.title}>Edit Profile</Text>
 
-      <Text style={styles.label}>Username:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your username"
-        value={username}
-        onChangeText={setUsername}
-      />
+        <Text style={styles.label}>Username:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your username"
+          value={username}
+          onChangeText={setUsername}
+        />
 
-      <Text style={styles.label}>Description:</Text>
-      <TextInput
-        style={[styles.input, { height: 100 }]}
-        placeholder="Enter your description"
-        value={description}
-        onChangeText={setDescription}
-        multiline
-      />
+        <Text style={styles.label}>Description:</Text>
+        <TextInput
+          style={[styles.input, { height: 100 }]}
+          placeholder="Enter your description"
+          value={description}
+          onChangeText={setDescription}
+          multiline
+        />
 
-      {isPending ? (
-        <ActivityIndicator size="large" color="#6f42c1" />
-      ) : (
-        <TouchableOpacity style={styles.button} onPress={handleUpdateProfile}>
-          <Text style={styles.buttonText}>Save Changes</Text>
-        </TouchableOpacity>
-      )}
-    </View>
+        {isPending ? (
+          <ActivityIndicator size="large" color="#6f42c1" />
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleUpdateProfile}>
+            <Text style={styles.buttonText}>Save Changes</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </>
   );
 }
 
