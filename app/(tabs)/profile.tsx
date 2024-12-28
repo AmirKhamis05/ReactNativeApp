@@ -6,38 +6,85 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import Navbar from "../components/NavBar";
 import { database, auth } from "../firebase/firebase";
 import { get, ref, remove, onValue } from "firebase/database";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import ProfileBlogList from "../components/ProfileBlogList";
+import SearchBar from "../components/SearchBar";
 
 const ProfileCard = () => {
   const userId = auth.currentUser?.uid;
   const router = useRouter();
+  const navigation = useNavigation();
   const [userData, setUserData] = useState({});
   const [blogs, setBlogs] = useState([]);
+  const [filteredBlogs, setFilteredBlogs] = useState([]);
   const [isPending, setIsPending] = useState(true);
+  const [userLoading, setUserLoading] = useState(true);
+  const [blogError, setBlogError] = useState(null);
+  const [userError, setUserError] = useState(null);
+
+  const fetchAuthor = async () => {
+    if (!auth.currentUser) return;
+    try {
+      const snapshot = await get(
+        ref(database, `users/${auth.currentUser.uid}`)
+      );
+      if (snapshot.exists()) {
+        setUserData(snapshot.val());
+      } else {
+        setUserError("User data not found.");
+      }
+    } catch (error) {
+      console.error("Error fetching author:", error);
+      setUserError("Failed to fetch user data.");
+    } finally {
+      setUserLoading(false);
+    }
+  };
 
   useEffect(() => {
+    fetchAuthor(); // Fetch data on component mount
+    const unsubscribe = navigation.addListener("focus", fetchAuthor); // Refresh on focus
+    return unsubscribe;
+  }, [navigation]);
+
+  // Fetch blogs with error handling
+  useEffect(() => {
     const blogsRef = ref(database, "blogs/");
-    const unsubscribe = onValue(blogsRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        const blogsArray = Object.keys(data).map((key) => ({
-          id: key,
-          ...data[key],
-        }));
-        setBlogs(blogsArray);
-      } else {
-        setBlogs([]);
+    const unsubscribe = onValue(
+      blogsRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const blogsArray = Object.keys(data).map((key) => ({
+            id: key,
+            ...data[key],
+          }));
+          setBlogs(blogsArray);
+          setFilteredBlogs(blogsArray);
+        } else {
+          setBlogs([]);
+          setFilteredBlogs([]);
+        }
+        setIsPending(false);
+      },
+      (error) => {
+        console.error("Error fetching blogs:", error);
+        setBlogError("Failed to load blogs. Please try again.");
+        setIsPending(false);
       }
-      setIsPending(false);
-    });
+    );
 
     return () => unsubscribe();
   }, []);
+
+  const handleFilter = (filteredData) => {
+    setFilteredBlogs(filteredData);
+  };
 
   const handleDelete = (id) => {
     const blogRef = ref(database, `blogs/${id}`);
@@ -46,65 +93,62 @@ const ProfileCard = () => {
     });
   };
 
-  useEffect(() => {
-    const fetchAuthor = async () => {
-      if (!userId) {
-        router.push("/auth/signIn");
-      }
-
-      try {
-        const snapshot = await get(ref(database, `users/${userId}`));
-        if (snapshot.exists()) {
-          setUserData(snapshot.val());
-        }
-      } catch (error) {
-        console.error("Error fetching author:", error);
-      }
-    };
-
-    fetchAuthor();
-  }, [userId]);
-
   return (
     <>
       <Navbar currentDashBoard={"profile"} />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.container}>
-          <View style={styles.card}>
-            <View style={styles.imageContainer}>
-              <Image
-                source={require("../../assets/images/profile/pfp.png")}
-                style={styles.profileImage}
-              />
-            </View>
-            <View style={styles.infoContainer}>
-              <Text style={styles.userBadge}>User</Text>
-              <Text style={styles.username}>
-                {userData.Username || "Guest"}
-              </Text>
-              <Text style={styles.subtitle}>Blogging Enthusiast</Text>
-              <View style={styles.descriptionContainer}>
-                <Text style={styles.description}>
-                  <Text style={styles.boldText}>Description:</Text>{" "}
-                  {userData.Description || "No description available."}
+          {userLoading ? (
+            <ActivityIndicator size="large" color="#6f42c1" />
+          ) : userError ? (
+            <Text style={styles.error}>{userError}</Text>
+          ) : (
+            <View style={styles.card}>
+              <View style={styles.imageContainer}>
+                <Image
+                  source={require("../../assets/images/profile/pfp.png")}
+                  style={styles.profileImage}
+                />
+              </View>
+              <View style={styles.infoContainer}>
+                <Text style={styles.userBadge}>User</Text>
+                <Text style={styles.username}>
+                  {userData.Username || "Guest"}
                 </Text>
-              </View>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.outlineButton}
-                  onPress={() => router.push("/(tabs)/editProfile")}
-                >
-                  <Text style={styles.outlineButtonText}>Edit Profile</Text>
-                </TouchableOpacity>
+                <Text style={styles.subtitle}>Blogging Enthusiast</Text>
+                <View style={styles.descriptionContainer}>
+                  <Text style={styles.description}>
+                    <Text style={styles.boldText}>Description:</Text>{" "}
+                    {userData.Description || "No description available."}
+                  </Text>
+                </View>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    style={styles.outlineButton}
+                    onPress={() => router.push("/(tabs)/editProfile")}
+                  >
+                    <Text style={styles.outlineButtonText}>Edit Profile</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
+          )}
 
           {/* Blog List */}
+          <SearchBar
+            data={blogs}
+            searchKeys={["title", "body", "author"]}
+            onFilter={handleFilter}
+            currentDashBoard={"profile"}
+          />
           <View style={styles.blogsContainer}>
-            {blogs.length !== 0 ? (
+            {blogError ? (
+              <Text style={styles.error}>{blogError}</Text>
+            ) : isPending ? (
+              <ActivityIndicator size="large" color="#6f42c1" />
+            ) : filteredBlogs.length !== 0 ? (
               <ProfileBlogList
-                blogs={blogs}
+                blogs={filteredBlogs}
                 title="Blog List"
                 handleDelete={handleDelete}
               />
@@ -211,16 +255,11 @@ const styles = StyleSheet.create({
     color: "#6f42c1",
     fontWeight: "bold",
   },
-  primaryButton: {
-    backgroundColor: "#6f42c1",
-    borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginHorizontal: 5,
-  },
-  primaryButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+  error: {
+    color: "red",
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 10,
   },
 });
 

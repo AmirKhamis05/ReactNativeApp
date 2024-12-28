@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Platform,
 } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "expo-router";
@@ -20,6 +21,20 @@ export default function SignUp() {
   const router = useRouter();
 
   const handleSignUp = async () => {
+    if (
+      !username.trim() ||
+      !email.trim() ||
+      !password.trim() ||
+      !description.trim()
+    ) {
+      if (Platform.OS === "web") {
+        window.alert("Missing Information, Please fill out all fields.");
+      } else {
+        Alert.alert("Missing Information", "Please fill out all fields.");
+        return;
+      }
+    }
+
     try {
       await createUserWithEmailAndPassword(auth, email, password).then(
         (userCredentials) => {
@@ -35,7 +50,11 @@ export default function SignUp() {
       );
       router.replace("/"); // Redirect to the main app
     } catch (error: any) {
-      Alert.alert("Sign Up Failed", error.message); // Display error in a modal alert
+      if (Platform.OS === "web") {
+        window.alert("Sign Up Failed " + error.message);
+      } else {
+        Alert.alert("Sign Up Failed", error.message);
+      }
     }
   };
 

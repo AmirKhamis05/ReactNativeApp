@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { database, auth } from "../firebase/firebase";
 import { ref, get, update } from "firebase/database";
@@ -95,11 +96,18 @@ export default function EditProfile() {
 
       await updateAllBlogs(userId, username);
 
-      Alert.alert("Success", "Profile updated successfully!");
-      router.replace("/(tabs)/profile");
+      if (Platform.OS === "web") {
+        window.alert("Success, Profile updated successfully");
+      } else {
+        Alert.alert("Success", "Profile updated successfully");
+      }
+      router.push("/(tabs)/profile");
     } catch (error) {
-      console.error("Error updating profile:", error);
-      Alert.alert("Error", "Failed to update profile.");
+      if (Platform.OS === "web") {
+        window.alert("Error, Failed to update profile.");
+      } else {
+        Alert.alert("Error", "Failed to update profile.");
+      }
     } finally {
       setIsPending(false);
     }

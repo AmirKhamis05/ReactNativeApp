@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   StyleSheet,
   Linking,
-  Platform,
 } from "react-native";
 import BlogList from "../components/BlogList";
 import { database } from "../firebase/firebase";
@@ -13,9 +12,11 @@ import { ref, onValue, remove } from "firebase/database";
 import { ScrollView } from "react-native-gesture-handler";
 import AppButton from "../components/ExternalLinkButton";
 import Navbar from "../components/NavBar";
+import SearchBar from "../components/SearchBar";
 
 const Home = () => {
   const [blogs, setBlogs] = useState([]);
+  const [filteredBlogs, setFilteredBlogs] = useState([]);
   const [isPending, setIsPending] = useState(true);
   const [error, setError] = useState(null);
 
@@ -29,8 +30,10 @@ const Home = () => {
           ...data[key],
         }));
         setBlogs(blogsArray);
+        setFilteredBlogs(blogsArray); // Initially show all blogs
       } else {
         setBlogs([]);
+        setFilteredBlogs([]);
       }
       setIsPending(false);
     });
@@ -44,11 +47,16 @@ const Home = () => {
       .then(() => {
         console.log(`Blog with ID ${id} deleted successfully.`);
         setBlogs(blogs.filter((blog) => blog.id !== id));
+        setFilteredBlogs(filteredBlogs.filter((blog) => blog.id !== id));
       })
       .catch((error) => {
         console.error("Error deleting blog:", error);
         setError("Failed to delete blog. Please try again.");
       });
+  };
+
+  const handleFilter = (filteredData) => {
+    setFilteredBlogs(filteredData);
   };
 
   const openLink = () => {
@@ -61,10 +69,16 @@ const Home = () => {
       <View style={styles.container}>
         {error && <Text style={styles.error}>{error}</Text>}
         {isPending && <ActivityIndicator size="large" color="#f1356d" />}
+        <SearchBar
+          data={blogs}
+          searchKeys={["title", "body", "author"]}
+          onFilter={handleFilter}
+          currentDashBoard={"main"}
+        />
         <ScrollView>
-          {blogs.length !== 0 ? (
+          {filteredBlogs.length !== 0 ? (
             <BlogList
-              blogs={blogs}
+              blogs={filteredBlogs}
               title="Blog List"
               handleDelete={handleDelete}
             />
@@ -85,12 +99,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: "flex-start", // Keep content aligned to the top
+    justifyContent: "flex-start",
     backgroundColor: "#fff",
   },
   buttonContainer: {
-    alignItems: "center", // Center the button horizontally
-    marginTop: 20, // Add some space above the button
+    alignItems: "center",
+    marginTop: 20,
   },
   error: {
     color: "red",

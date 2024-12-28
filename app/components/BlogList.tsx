@@ -50,7 +50,8 @@ const BlogList = ({ blogs, title, handleDelete }) => {
           <Text style={styles.blogBody}>Content: {blog.body}</Text>
           <Text style={styles.author}>Written by: {blog.author}</Text>
           <View style={styles.buttonContainer}>
-            {blog.userId == userId ? (
+            {blog.userId == userId ||
+            auth.currentUser.email === "admin@gmail.com" ? (
               <>
                 <TouchableOpacity
                   style={[styles.deleteButton]}

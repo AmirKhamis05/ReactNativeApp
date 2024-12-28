@@ -38,33 +38,22 @@ export default function Navbar({ currentDashBoard }: any) {
 
   return (
     <View style={[styles.navContainer, dynamicNavStyle]}>
-      {currentDashBoard === "main" && (
-        <View style={styles.navbar}>
-          {/* Website Name */}
-          <TouchableOpacity onPress={onHomePress}>
-            <Text style={styles.title}>Personal Blogs</Text>
-          </TouchableOpacity>
+      <View style={styles.navbar}>
+        {/* Website Name */}
+        <TouchableOpacity onPress={onHomePress}>
+          <Text style={styles.title}>BlogBlog</Text>
+        </TouchableOpacity>
 
-          {/* Profile Option */}
+        {currentDashBoard === "main" ? (
           <TouchableOpacity onPress={onProfilePress}>
             <Text style={styles.profile}>Profile</Text>
           </TouchableOpacity>
-        </View>
-      )}
-
-      {currentDashBoard === "profile" && (
-        <View style={styles.navbar}>
-          {/* Website Name */}
-          <TouchableOpacity onPress={onHomePress}>
-            <Text style={styles.title}>Personal Blogs</Text>
-          </TouchableOpacity>
-
-          {/* Profile Option */}
+        ) : (
           <TouchableOpacity onPress={onSignOut}>
             <Text style={styles.profile}>Signout</Text>
           </TouchableOpacity>
-        </View>
-      )}
+        )}
+      </View>
     </View>
   );
 }

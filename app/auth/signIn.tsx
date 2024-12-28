@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Platform,
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "expo-router";
@@ -19,9 +20,13 @@ export default function SignIn() {
   const handleSignIn = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.replace("/"); // Navigate to the main app
+      router.replace("/");
     } catch (error: any) {
-      Alert.alert("Sign In Failed", error.message); // Display error in a modal alert
+      if (Platform.OS === "web") {
+        window.alert("Sign In Failed " + error.message);
+      } else {
+        Alert.alert("Sign In Failed", error.message);
+      }
     }
   };
 
