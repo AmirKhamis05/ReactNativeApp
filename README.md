@@ -11,7 +11,7 @@
 ### Technologies Used
 
 - **React Native**: For building a cross-platform mobile application with a single codebase.
-- **Expo**: Simplifies development, testing, and deployment across iOS and Android platforms.
+- **Expo**: Simplifies development, testing, and deployment across WEB and Mobile Platforms.
 - **Firebase**: Backend services, including:
   - **Authentication**: For secure user login and registration.
   - **Realtime Database**: To store and retrieve blog posts.
