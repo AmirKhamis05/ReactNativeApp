@@ -26,7 +26,7 @@
    ```
 4. Run the app:
    ```
-   expo start
+   npx expo start -c
    ```
 
 ### Dependencies
