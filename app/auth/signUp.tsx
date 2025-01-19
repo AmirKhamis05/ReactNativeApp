@@ -11,7 +11,7 @@ import {
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "expo-router";
 import { database, auth } from "../firebase/firebase";
-import { ref, set } from "firebase/database";
+import { ref, set, get, query, orderByChild, equalTo } from "firebase/database";
 
 export default function SignUp() {
   const [username, setUsername] = useState("");
@@ -31,23 +31,45 @@ export default function SignUp() {
         window.alert("Missing Information, Please fill out all fields.");
       } else {
         Alert.alert("Missing Information", "Please fill out all fields.");
-        return;
       }
+      return;
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password).then(
-        (userCredentials) => {
-          const user = userCredentials.user;
-          const uid = user.uid;
-
-          set(ref(database, "users/" + uid), {
-            Username: username,
-            Email: email,
-            Description: description,
-          });
-        }
+      // Check if the username exists
+      const usernameQuery = query(
+        ref(database, "users"),
+        orderByChild("Username"),
+        equalTo(username)
       );
+
+      const snapshot = await get(usernameQuery);
+      if (snapshot.exists()) {
+        // Username already taken
+        if (Platform.OS === "web") {
+          window.alert("Username is already taken. Please choose another.");
+        } else {
+          Alert.alert("Invalid Username", "Username is already taken.");
+        }
+        return;
+      }
+
+      // Proceed with user creation
+      const userCredentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredentials.user;
+      const uid = user.uid;
+
+      // Save user details in the database
+      await set(ref(database, "users/" + uid), {
+        Username: username,
+        Email: email,
+        Description: description,
+      });
+
       router.replace("/"); // Redirect to the main app
     } catch (error: any) {
       if (Platform.OS === "web") {

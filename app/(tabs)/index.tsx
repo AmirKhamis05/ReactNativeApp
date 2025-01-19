@@ -85,10 +85,6 @@ const Home = () => {
           ) : (
             <Text style={styles.emptyContainer}>No blogs found.</Text>
           )}
-
-          <View style={styles.buttonContainer}>
-            <AppButton title="Nostalgia" onPress={openLink} />
-          </View>
         </ScrollView>
       </View>
     </>

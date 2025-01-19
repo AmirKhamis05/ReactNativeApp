@@ -63,65 +63,75 @@ const SingleBlog = () => {
 
   return (
     <>
-      <Navbar currentDashBoard={"main"} />
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Blog Details */}
-        <View style={styles.blogCard}>
-          <Text style={styles.blogTitle}>{title}</Text>
-          <Text style={styles.blogBody}>{body}</Text>
-          <Text style={styles.blogAuthor}>Written by: {author}</Text>
-          {currentUserId == userId && (
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.deleteButton]}
-                onPress={() => handleDelete(blogId)}
-              >
-                <Text style={styles.deleteText}>Delete Blog</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.deleteButton, { marginHorizontal: 10 }]}
-                onPress={() => handleEdit()}
-              >
-                <Text style={styles.deleteText}>Edit Blog</Text>
-              </TouchableOpacity>
+      <View style={styles.mainCont}>
+        <Navbar currentDashBoard={"main"} />
+        <View style={styles.flexContainer}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <View style={styles.blogCard}>
+              <Text style={styles.blogTitle}>{title}</Text>
+              <Text style={styles.blogBody}>{body}</Text>
+              <Text style={styles.blogAuthor}>Written by: {author}</Text>
+              {currentUserId === userId && (
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => handleDelete(blogId)}
+                  >
+                    <Text style={styles.deleteText}>Delete Blog</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.deleteButton, { marginHorizontal: 10 }]}
+                    onPress={handleEdit}
+                  >
+                    <Text style={styles.deleteText}>Edit Blog</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
-          )}
-        </View>
 
-        {/* Author Profile */}
-        <View style={styles.authorCard}>
-          <Image
-            source={require("../../assets/images/profile/pfp.png")}
-            style={styles.profileImage}
-          />
-          <Text style={styles.username}>{authorData.Username || "Guest"}</Text>
-          <Text style={styles.subtitle}>Blogging Enthusiast</Text>
-          <Text style={styles.description}>
-            {authorData.Description || "No description available."}
-          </Text>
-          {currentUserId === userId && (
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.outlineButton}
-                onPress={() => router.push("/(tabs)/profile")}
-              >
-                <Text style={styles.outlineButtonText}>Go To Profile</Text>
-              </TouchableOpacity>
+            <View style={styles.authorCard}>
+              <Image
+                source={require("../../assets/images/profile/pfp.png")}
+                style={styles.profileImage}
+              />
+              <Text style={styles.username}>
+                {authorData.Username || "Guest"}
+              </Text>
+              <Text style={styles.subtitle}>Blogging Enthusiast</Text>
+              <Text style={styles.description}>
+                {authorData.Description || "No description available."}
+              </Text>
+              {currentUserId === userId && (
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    style={styles.outlineButton}
+                    onPress={() => router.push("/(tabs)/profile")}
+                  >
+                    <Text style={styles.outlineButtonText}>Go To Profile</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
-          )}
+          </ScrollView>
         </View>
-      </ScrollView>
+      </View>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
+  mainCont: {
+    flex: 1,
     backgroundColor: "#f5f5f5",
+  },
+  flexContainer: {
+    flex: 1,
+    padding: 20,
+  },
+  scrollContent: {
+    flexGrow: 1,
     alignItems: "center",
     gap: 20,
-    height: "100%",
   },
   blogCard: {
     backgroundColor: "#fff",
