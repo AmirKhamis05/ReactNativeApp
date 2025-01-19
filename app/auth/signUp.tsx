@@ -36,7 +36,6 @@ export default function SignUp() {
     }
 
     try {
-      // Check if the username exists
       const usernameQuery = query(
         ref(database, "users"),
         orderByChild("Username"),
@@ -45,7 +44,6 @@ export default function SignUp() {
 
       const snapshot = await get(usernameQuery);
       if (snapshot.exists()) {
-        // Username already taken
         if (Platform.OS === "web") {
           window.alert("Username is already taken. Please choose another.");
         } else {
@@ -54,7 +52,6 @@ export default function SignUp() {
         return;
       }
 
-      // Proceed with user creation
       const userCredentials = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -63,14 +60,13 @@ export default function SignUp() {
       const user = userCredentials.user;
       const uid = user.uid;
 
-      // Save user details in the database
       await set(ref(database, "users/" + uid), {
         Username: username,
         Email: email,
         Description: description,
       });
 
-      router.replace("/"); // Redirect to the main app
+      router.replace("/");
     } catch (error: any) {
       if (Platform.OS === "web") {
         window.alert("Sign Up Failed " + error.message);
